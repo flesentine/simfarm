@@ -82,12 +82,13 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .tabbar button.active { color: #3a2b1a; background: #ffcc33; }
 .sheet { position: fixed; inset: 0; background: rgba(58,43,26,.6); display: flex; align-items: flex-end; justify-content: center; z-index: 20; }
 .sheet-box { width: 100%; max-width: 480px; background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a;
-  border-bottom: 0; border-radius: 14px 14px 0 0; padding: 14px 14px 34px; box-shadow: 0 -6px 0 rgba(58,43,26,.4); }
+  border-bottom: 0; border-radius: 14px 14px 0 0; padding: 14px 14px 34px; box-shadow: 0 -6px 0 rgba(58,43,26,.4);
+  max-height: 82vh; overflow-y: auto; }
 .sheet-head { display: flex; justify-content: space-between; align-items: center; }
 .sheet-art { display: flex; justify-content: center; padding: 8px; margin: 6px 0;
   background: repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%); background-size: 20px 20px;
   border: 4px solid #3a2b1a; border-radius: 8px; }
-.sheet-art svg { width: 96px; height: 96px; image-rendering: pixelated; background: rgba(253,246,216,.7); border: 3px solid #3a2b1a; border-radius: 6px; }
+.sheet-art .sprite { width: 84px; height: 84px; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; }
 button { border: 3px solid #3a2b1a; box-shadow: 3px 3px 0 rgba(58,43,26,.6); padding: 10px 12px;
   font-family: inherit; font-size: 13px; cursor: pointer; background: #fdf6d8; color: #3a2b1a;
@@ -123,8 +124,8 @@ h2, h3 { color: #3a2b1a; background: #ffcc33; display: inline-block; padding: 4p
 .mini { display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 3px; }
 .mini svg { width: 100%; height: 100%; image-rendering: pixelated; }
 .mini.big { width: 24px; height: 24px; }
-.art.wet { background: rgba(58,150,220,.22); }
-.art.dry { background: rgba(255,255,255,.18); }
+.plot .art.wet { background: rgba(58,150,220,.22); }
+.plot .art.dry { background: rgba(255,255,255,.18); }
 .plot.thirsty .art { outline: 3px dashed #3a9ad9; outline-offset: -3px; }
 .packet-art { text-align: center; }
 .packet-top { background: #3a2b1a; color: #ffcc33; font-size: 10px; padding: 3px 6px; border-radius: 6px 6px 0 0; }
@@ -137,7 +138,7 @@ h2, h3 { color: #3a2b1a; background: #ffcc33; display: inline-block; padding: 4p
 .task.done { background: #d8f3c6; }
 .farmer { display: flex; gap: 12px; align-items: center; }
 .farmer-av { width: 64px; height: 64px; background: repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%); background-size: 16px 16px; border: 4px solid #3a2b1a; border-radius: 8px; flex-shrink: 0; }
-.farmer-av svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.farmer-av img { width: 100%; height: 100%; image-rendering: pixelated; }
 .plot.ready .stage::after { content: " ★"; color: #7a4e28; animation: twinkle .6s steps(2) infinite; }
 @keyframes twinkle { 50% { opacity: .2; } }
 .xpbar div { position: relative; }
@@ -222,7 +223,7 @@ button { transition: transform .05s steps(2); }
 
 /* ===== RPG chrome: HUD portrait, dialogue, quests, codex, floaters ===== */
 .hud-portrait { width: 38px; height: 38px; background: #8fd16a; border: 3px solid #ffcc33; border-radius: 6px; flex-shrink: 0; margin-left: 8px; }
-.hud-portrait svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.hud-portrait img { width: 100%; height: 100%; image-rendering: pixelated; }
 .brand { margin: 0 4px; }
 #view-farm .tip, #view-farm .away { display: flex; gap: 8px; align-items: flex-start; background: #1c2b1a; color: #fdf6d8; border-color: #fdf6d8; }
 .dlg-face { width: 40px; height: 40px; flex-shrink: 0; background: #8fd16a; border: 3px solid #fdf6d8; border-radius: 6px; }

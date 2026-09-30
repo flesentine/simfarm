@@ -54,8 +54,7 @@ function cropArt(cropId, stage, wet, prog = 0) {
     const sp = SPRITES[cropId];
     return `<div class="cellwrap">${spriteImg(sp.xs[cell], sp.row, 'sprite')}${stage === 'ready' ? '<span class="spark"></span>' : ''}</div>`;
   }
-  const blink = R(1, 1, 1, 1, '#fff') + R(14, 1, 2, 1, '#fff') + R(14, 3, 1, 2, '#fff') + R(1, 4, 1, 2, '#fff');
-  // legacy hand-drawn crops retired - the SPRITES branch above handles all crops
+  // (hand-drawn fallback below; SPRITES branch above handles all crops)
   return open(R(5, 8, 6, 4, '#7ed957'));
 }
 // 16-bit sprites: <span class="sprite"> shows one cell of art/crops.png.
@@ -387,8 +386,7 @@ function renderGrid() {
       const pct = Math.round(info.progress * 100);
       const wet = !info.needsWater;
       const artStage = info.state === 'dead' ? 'dead' : info.state === 'wilted' ? 'wilted' : info.state === 'ready-thirsty' ? 'ready' : info.state;
-      const hearts = Math.ceil(p.health / 20);
-      const hpRow = info.state === 'dead' ? '<span class="badge hp">WITHERED</span>' : `<span class="badge hp" title="health">${'♥'.repeat(hearts)}${'♡'.repeat(5 - hearts)} ${Math.round(p.health)}</span>`;
+      const hpRow = info.state === 'dead' ? '<span class="badge hp">WITHERED</span>' : `<span class="badge hp"><i class="mini">${iconArt('heart')}</i>${Math.round(p.health)}</span>`;
       const badges = `${info.needsWater && !p.dead ? `<span class="badge water"><i class="mini">${iconArt('drop')}</i>WATER</span>` : ''}${p.weed ? `<span class="badge weed"><i class="mini">${iconArt('weed')}</i>WEED</span>` : ''}${fertActive(p, now) ? `<span class="badge boost"><i class="mini">${iconArt('boost')}</i>BOOST</span>` : ''}${p.sprinkler ? `<span class="badge boost"><i class="mini">${iconArt('drop')}</i>AUTO</span>` : ''}${hpRow}`;
       b.innerHTML = `<div class="art ${wet ? 'wet' : 'dry'}">${cropArt(p.cropId, artStage, wet, info.progress)}</div>
         <div class="cname">${def.name}</div>
