@@ -121,7 +121,7 @@ function defaultState() {
     streak: 1, lastVisitDate: todayStr(), lastSeen: Date.now(),
     totalHarvests: 0, codex: {}, stats: { water: 0, plant: 0 },
     plots,
-    tasks: { date: todayStr(), water: 0, plant: 0, harvest: 0, claimed: false },
+    tasks: { date: todayStr(), water: 0, plant: 0, harvest: 0, claimed: false, paid: { water: false, plant: false, harvest: false } },
   };
 }
 
@@ -135,6 +135,7 @@ function load() {
     if (!s.plots || s.plots.length !== 12) return defaultState();
     if (!s.codex) s.codex = {};
     if (!s.stats) s.stats = { water: 0, plant: 0 };
+    if (!s.tasks.paid) s.tasks.paid = { water: false, plant: false, harvest: false };
     // migrate pre-16bit crop ids to matching sprite crops (same stats)
     s.plots.forEach(p => { if (p.cropId && OLD_IDS[p.cropId]) p.cropId = OLD_IDS[p.cropId]; });
     Object.keys(OLD_IDS).forEach(old => {
@@ -145,10 +146,25 @@ function load() {
 }
 function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
 
-function xpNeeded() { return S.level * 100; }
+function xpNeeded() { return 40 + S.level * 30; }
 function addXp(n) {
   S.xp += n;
   while (S.xp >= xpNeeded()) { S.xp -= xpNeeded(); S.level++; }
+}
+// daily quests pay out once each when their goal is first reached
+const QUESTS = {
+  water: { goal: 3, reward: 15 },
+  plant: { goal: 2, reward: 10 },
+  harvest: { goal: 1, reward: 25 },
+};
+function maybePayQuest(k) {
+  const q = QUESTS[k];
+  if (!S.tasks.paid) S.tasks.paid = { water: false, plant: false, harvest: false };
+  if (S.tasks[k] >= q.goal && !S.tasks.paid[k]) {
+    S.tasks.paid[k] = true;
+    S.coins += q.reward;
+    floatText(`Quest done! +${q.reward}c`);
+  }
 }
 
 // --- time engine ---
@@ -183,7 +199,7 @@ function tick(now = Date.now()) {
     if (S.lastVisitDate === yesterday) S.streak++;
     else if (S.lastVisitDate !== today) S.streak = 1;
     S.lastVisitDate = today;
-    S.tasks = { date: today, water: 0, plant: 0, harvest: 0, claimed: false };
+    S.tasks = { date: today, water: 0, plant: 0, harvest: 0, claimed: false, paid: { water: false, plant: false, harvest: false } };
     // daily weeds: 15% per growing plot
     S.plots.forEach(p => {
       if (p.unlocked && p.cropId && !p.dead && Math.random() < 0.15) p.weed = true;
@@ -237,6 +253,7 @@ function plant(idx, cropId) {
   S.stats.plant++;
   addXp(2);
   floatText('Planted!');
+  maybePayQuest('plant');
   save(); render(); return true;
 }
 function water(idx) {
@@ -248,6 +265,7 @@ function water(idx) {
   S.stats.water++;
   addXp(3);
   floatText('Watered!');
+  maybePayQuest('water');
   save(); render();
 }
 function fertilize(idx) {
@@ -273,6 +291,7 @@ function harvest(idx) {
   const lvlBefore = S.level;
   addXp(def.xp);
   floatText(`+${gain}c  +${def.xp}xp`);
+  maybePayQuest('harvest');
   if (S.level > lvlBefore) floatText(`LEVEL UP! Lv${S.level}`, true);
   const weed = false;
   Object.assign(p, { cropId: null, plantedAt: 0, lastWateredAt: 0, health: 100, dead: false, weed, fertilizedAt: 0 });
