@@ -3,11 +3,19 @@ const H = 3600e3;
 const DAY = 24 * H;
 
 const CROPS = {
-  lettuce: { id: 'lettuce', name: 'Lettuce', sell: 15,  xp: 10, growMs: 48*H,  waterMs: 18*H, minLevel: 1, desc: '2 days, easy' },
-  carrot:  { id: 'carrot',  name: 'Carrot',  sell: 30,  xp: 20, growMs: 72*H,  waterMs: 18*H, minLevel: 2, desc: '3 days' },
+  wheat:   { id: 'wheat',   name: 'Wheat',   sell: 15,  xp: 10, growMs: 48*H,  waterMs: 18*H, minLevel: 1, desc: '2 days, easy' },
+  turnip:  { id: 'turnip',  name: 'Turnip',  sell: 30,  xp: 20, growMs: 72*H,  waterMs: 18*H, minLevel: 2, desc: '3 days, hardy root' },
   tomato:  { id: 'tomato',  name: 'Tomato',  sell: 60,  xp: 35, growMs: 96*H,  waterMs: 12*H, minLevel: 3, desc: '4 days, thirsty' },
-  pumpkin: { id: 'pumpkin', name: 'Pumpkin', sell: 140, xp: 80, growMs: 168*H, waterMs: 24*H, minLevel: 5, desc: '7 days, valuable' },
+  melon:   { id: 'melon',   name: 'Melon',   sell: 140, xp: 80, growMs: 168*H, waterMs: 24*H, minLevel: 5, desc: '7 days, prize fruit' },
 };
+// 16-bit crop sprites (CC0, josehzz via OpenGameArt): sheet cells, [portraitX, s0..s4 X], row Y (px)
+const SPRITES = {
+  wheat:  { row: 80, xs: [0, 16, 32, 48, 64, 80] },
+  turnip: { row: 0,  xs: [0, 16, 32, 48, 64, 80] },
+  tomato: { row: 32, xs: [0, 16, 32, 48, 64, 80] },
+  melon:  { row: 32, xs: [96, 112, 128, 144, 160, 176] },
+};
+const OLD_IDS = { lettuce: 'wheat', carrot: 'turnip', pumpkin: 'melon' };
 
 const UNLOCK_COST = { 6: 200, 7: 200, 8: 200, 9: 500, 10: 500, 11: 500 };
 const SAVE_KEY = 'simfarm-v1';
@@ -30,7 +38,7 @@ function iconArt(name) {
   if (name === 'lock') return open(R(4, 7, 8, 6, '#3a3a3a') + R(4, 7, 8, 1, '#777') + R(5, 4, 6, 3, '#3a3a3a') + R(6, 5, 4, 2, '#fdf6d8') + R(7, 9, 2, 2, '#ffcc33'));
   return open(R(3, 3, 10, 10, '#ccc'));
 }
-function cropArt(cropId, stage, wet) {
+function cropArt(cropId, stage, wet, prog = 0) {
   // R = helper: x,y,w,h,color -> pixel rect
   const R = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
   const soil = soilArt(!!wet);
@@ -38,31 +46,26 @@ function cropArt(cropId, stage, wet) {
   const flat = (inner) => `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${inner}</svg>`;
   if (stage === 'locked') return flat(R(0, 0, 16, 16, '#4a4a4a') + R(0, 0, 16, 2, '#666') + iconArt('lock').replace(/<\/?svg[^>]*>/g, ''));
   if (stage === 'empty') return flat(soil + R(6, 7, 4, 1, '#3d2b1a') + R(7, 6, 2, 3, '#3d2b1a') + R(3, 9, 2, 1, '#6b4426') + R(11, 10, 2, 1, '#6b4426'));
-  if (stage === 'seed') return open(R(3, 10, 3, 2, '#2b1e12') + R(4, 11, 2, 1, '#5a3d24') + R(7, 10, 3, 2, '#2b1e12') + R(8, 11, 2, 1, '#6b4426') + R(11, 10, 2, 2, '#2b1e12') + R(4, 10, 1, 1, '#c08a4e'));
-  if (stage === 'sprout') return open(R(7, 7, 2, 6, '#1e4a22') + R(7, 7, 1, 6, '#2d5a27') + R(3, 6, 4, 3, '#2b4a1e') + R(3, 6, 4, 2, '#7ed957') + R(9, 6, 4, 3, '#2b4a1e') + R(9, 6, 4, 2, '#5fbf3f') + R(3, 6, 1, 1, '#d6f5b0'));
-  if (stage === 'dead') return open(R(6, 4, 1, 7, '#4a4a4a') + R(9, 4, 1, 7, '#4a4a4a') + R(4, 6, 8, 1, '#555') + R(5, 9, 2, 2, '#333') + R(9, 9, 2, 2, '#333') + R(12, 3, 1, 1, '#222') + R(13, 4, 2, 1, '#222'));
-  if (stage === 'wilted') return open(R(7, 7, 2, 6, '#5a4e2e') + R(2, 8, 5, 3, '#6b5a35') + R(2, 8, 5, 1, '#a08b4d') + R(9, 9, 5, 3, '#5a4a2c') + R(9, 9, 5, 1, '#8a7640'));
+  // 16-bit CC0 sprites (josehzz): 5 growth cells per crop. Wilted/dead reuse
+  // live cells - the plot CSS tints them sepia/grayscale.
+  if (SPRITES[cropId]) {
+    const cell = stage === 'seed' ? 1 : stage === 'sprout' ? 2
+      : stage === 'growing' ? (prog >= 0.75 ? 4 : 3) : stage === 'wilted' ? 3 : 5;
+    const sp = SPRITES[cropId];
+    return `<div class="cellwrap">${spriteImg(sp.xs[cell], sp.row, 'sprite')}${stage === 'ready' ? '<span class="spark"></span>' : ''}</div>`;
+  }
   const blink = R(1, 1, 1, 1, '#fff') + R(14, 1, 2, 1, '#fff') + R(14, 3, 1, 2, '#fff') + R(1, 4, 1, 2, '#fff');
-  // strong dark outlines behind each sprite so silhouettes read at small size (Stardew rule)
-  if (cropId === 'lettuce') {
-    if (stage === 'growing') return open(R(4, 6, 8, 7, '#223d18') + R(5, 7, 6, 5, '#3f7a2b') + R(5, 7, 6, 2, '#5fbf3f') + R(6, 6, 4, 2, '#7ed957') + R(6, 6, 1, 1, '#d6f5b0'));
-    return open(R(2, 4, 12, 9, '#223d18') + R(3, 6, 10, 6, '#3f7a2b') + R(3, 6, 10, 3, '#5fbf3f') + R(5, 5, 6, 3, '#7ed957') + R(6, 7, 4, 4, '#e8f7c8') + R(6, 7, 2, 2, '#fff') + blink);
-  }
-  if (cropId === 'carrot') {
-    if (stage === 'growing') return open(R(5, 3, 2, 9, '#1e3a1b') + R(7, 2, 2, 10, '#1e3a1b') + R(9, 3, 2, 9, '#24401f') + R(5, 3, 1, 9, '#3a7a33') + R(7, 2, 1, 10, '#2d5a27') + R(2, 11, 4, 1, '#2b1e12'));
-    return open(R(5, 2, 2, 8, '#1e3a1b') + R(7, 1, 2, 9, '#1e3a1b') + R(9, 2, 2, 8, '#24401f') + R(5, 2, 1, 8, '#55a03a') + R(7, 1, 1, 9, '#2d5a27') + R(4, 9, 8, 4, '#7a3a00') + R(5, 10, 6, 3, '#ff9f1c') + R(5, 10, 2, 3, '#ffd0a0') + R(8, 10, 1, 3, '#c96a00') + blink);
-  }
-  if (cropId === 'tomato') {
-    if (stage === 'growing') return open(R(3, 5, 10, 8, '#1e3a1b') + R(4, 6, 8, 6, '#2d5a27') + R(4, 6, 8, 2, '#4da636') + R(7, 4, 2, 2, '#2d5a27'));
-    return open(R(3, 5, 10, 8, '#1e3a1b') + R(4, 6, 8, 6, '#2d5a27') + R(4, 6, 8, 2, '#5fbf3f') + R(4, 8, 3, 3, '#5a1016') + R(9, 8, 3, 3, '#5a1016') + R(6, 6, 4, 4, '#5a1016') + R(4, 8, 3, 3, '#e63946') + R(9, 8, 3, 3, '#e63946') + R(6, 6, 4, 4, '#ff5964') + R(4, 8, 1, 1, '#fff') + R(6, 6, 1, 1, '#fff') + R(9, 8, 1, 1, '#ffb3ba') + blink);
-  }
-  // pumpkin
-  if (stage === 'growing') return open(R(1, 10, 14, 2, '#1e3a1b') + R(5, 8, 6, 4, '#223d18') + R(6, 9, 4, 3, '#7ab648') + R(6, 9, 2, 1, '#c6f09a') + R(7, 7, 2, 2, '#2d5a27'));
-  return open(R(1, 10, 14, 2, '#1e3a1b') + R(2, 5, 12, 8, '#5a2a00') + R(3, 6, 10, 6, '#ff6b18') + R(3, 6, 10, 2, '#ffb37a') + R(5, 6, 1, 6, '#c94f00') + R(7, 6, 2, 6, '#e05a00') + R(10, 6, 1, 6, '#c94f00') + R(7, 4, 2, 3, '#1e3a1b') + R(7, 4, 2, 2, '#4da636') + R(3, 6, 2, 1, '#fff') + blink);
+  // legacy hand-drawn crops retired - the SPRITES branch above handles all crops
   return open(R(5, 8, 6, 4, '#7ed957'));
 }
+// 16-bit sprites: <span class="sprite"> shows one cell of art/crops.png.
+// position in % of the 12x10-cell sheet so it scales to any box size.
+function spriteImg(cellX, cellY, cls = 'sprite') {
+  const px = (cellX / 16 / 11) * 100, py = (cellY / 16 / 9) * 100;
+  return `<span class="${cls}" style="background-position:${px}% ${py}%"></span>`;
+}
 function farmerArt() {
-  return `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect x="4" y="2" width="8" height="3" fill="#e8c33a"/><rect x="2" y="5" width="12" height="2" fill="#c9a227"/><rect x="5" y="7" width="6" height="5" fill="#f0c8a0"/><rect x="5" y="9" width="2" height="1" fill="#222"/><rect x="9" y="9" width="2" height="1" fill="#222"/><rect x="4" y="12" width="8" height="4" fill="#3a7ad9"/><rect x="7" y="12" width="2" height="4" fill="#2b5aa0"/></svg>`;
+  return `<img class="pixel" src="art/farmer.png" alt="farmer" width="16" height="16" />`;
 }
 function scarecrowArt() {
   return `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect x="7" y="2" width="2" height="4" fill="#c9a227"/><rect x="4" y="3" width="8" height="2" fill="#8a5a33"/><rect x="5" y="6" width="6" height="4" fill="#e8d8a0"/><rect x="6" y="7" width="1" height="1" fill="#222"/><rect x="9" y="7" width="1" height="1" fill="#222"/><rect x="3" y="10" width="10" height="1" fill="#5a3d24"/><rect x="7" y="10" width="2" height="6" fill="#5a3d24"/><rect x="4" y="12" width="3" height="3" fill="#a03a3a"/><rect x="9" y="12" width="3" height="3" fill="#3a7ad9"/></svg>`;
@@ -132,6 +135,11 @@ function load() {
     if (!s.plots || s.plots.length !== 12) return defaultState();
     if (!s.codex) s.codex = {};
     if (!s.stats) s.stats = { water: 0, plant: 0 };
+    // migrate pre-16bit crop ids to matching sprite crops (same stats)
+    s.plots.forEach(p => { if (p.cropId && OLD_IDS[p.cropId]) p.cropId = OLD_IDS[p.cropId]; });
+    Object.keys(OLD_IDS).forEach(old => {
+      if (s.codex[old]) { s.codex[OLD_IDS[old]] = (s.codex[OLD_IDS[old]] || 0) + s.codex[old]; delete s.codex[old]; }
+    });
     return s;
   } catch { return defaultState(); }
 }
@@ -221,7 +229,7 @@ function plant(idx, cropId) {
   if (!p || !p.unlocked) { alert('That plot is locked.'); return false; }
   if (p.cropId) { alert('Something already grows here.'); return false; }
   if (!def) return false;
-  if (S.level < def.minLevel) { alert(`${def.name} needs Lv${def.minLevel} (you are Lv${S.level}). Harvest Lettuce to earn XP!`); return false; }
+  if (S.level < def.minLevel) { alert(`${def.name} needs Lv${def.minLevel} (you are Lv${S.level}). Harvest Wheat to earn XP!`); return false; }
   // seeds are free - the risk is your time and daily care, never your wallet
   const now = Date.now();
   Object.assign(p, { cropId, plantedAt: now, lastWateredAt: now, health: 100, dead: false, weed: false, fertilizedAt: 0 });
@@ -308,7 +316,7 @@ function render() {
   const now = Date.now();
   let thirsty = 0, ready = 0, dead = 0, planted = 0;
   S.plots.forEach(p => { if (p.cropId) planted++; const i = plotInfo(p, now); if (i.state === 'dead') dead++; else if (i.state.startsWith('ready')) ready++; else if (i.needsWater) thirsty++; });
-  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Lettuce (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : 'All crops look good. Check back tomorrow.';
+  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Wheat (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : 'All crops look good. Check back tomorrow.';
   $('tip').innerHTML = `<span class="dlg-face">${scarecrowArt()}</span><span class="dlg-body"><span class="dlg-name">SCARECROW</span>${tipTxt}</span><span class="dlg-cursor"></span>`;
 }
 
@@ -335,7 +343,7 @@ function renderGrid() {
       const hearts = Math.ceil(p.health / 20);
       const hpRow = info.state === 'dead' ? '<span class="badge hp">WITHERED</span>' : `<span class="badge hp" title="health">${'♥'.repeat(hearts)}${'♡'.repeat(5 - hearts)} ${Math.round(p.health)}</span>`;
       const badges = `${info.needsWater && !p.dead ? `<span class="badge water"><i class="mini">${iconArt('drop')}</i>WATER</span>` : ''}${p.weed ? `<span class="badge weed"><i class="mini">${iconArt('weed')}</i>WEED</span>` : ''}${fertActive(p, now) ? `<span class="badge boost"><i class="mini">${iconArt('boost')}</i>BOOST</span>` : ''}${hpRow}`;
-      b.innerHTML = `<div class="art ${wet ? 'wet' : 'dry'}">${cropArt(p.cropId, artStage, wet)}</div>
+      b.innerHTML = `<div class="art ${wet ? 'wet' : 'dry'}">${cropArt(p.cropId, artStage, wet, info.progress)}</div>
         <div class="cname">${def.name}</div>
         <div class="stage">${stageLabel(info)} ${pct}%</div>
         <div class="bar"><i style="width:${pct}%"></i></div>
@@ -458,7 +466,7 @@ function openSheet() {
       + (info.state.startsWith('ready') ? `<button id="aHarv" class="btn-harv">Harvest +${preview}c${quality < 1 ? ' (thirsty)' : ''}</button>` : '');
   }
   $('sheetBody').innerHTML = `
-    <div class="sheet-art">${cropArt(p.cropId, artStage, !info.needsWater)}</div>
+    <div class="sheet-art">${cropArt(p.cropId, artStage, !info.needsWater, info.progress)}</div>
     <p>Progress ${Math.round(info.progress * 100)}% | Health ${Math.round(p.health)}${p.weed ? ' | Weeds! Remove to grow happy.' : ''}</p>
     <p class="muted">${info.needsWater ? 'Thirsty - water now or health drops.' : `Watered. Needs water again in ~${nextWaterH}h.`}${quality < 1 && info.state.startsWith('ready') ? ' Dry harvest pays half.' : ''}</p>
     <div class="row">${actionRow}</div>`;

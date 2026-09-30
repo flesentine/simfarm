@@ -295,3 +295,15 @@ body[data-weather="rain"] #view-farm::before { content: ""; position: absolute; 
 .task .quest-bar { height: 6px; background: #3a2b1a; border-radius: 4px; margin-top: 4px; overflow: hidden; }
 .task .quest-bar i { display: block; height: 100%; background: #4da636; }
 .waterall { background: #3a9ad9; color: #fff; width: 100%; margin-top: 10px; }
+
+/* ===== 16-bit CC0 sprites (josehzz crops, Kenney farmer) ===== */
+.sprite { display: inline-block; width: 64px; height: 64px; background-image: url("art/crops.png");
+  background-size: 1200% 1000%; background-repeat: no-repeat; image-rendering: pixelated; }
+.cellwrap { position: relative; display: inline-block; }
+.cellwrap .sprite { filter: drop-shadow(0 3px 0 rgba(0,0,0,.35)); }
+.spark { position: absolute; top: 2px; right: 6px; width: 6px; height: 6px; background: #fff;
+  box-shadow: 10px 8px 0 #fff, -8px 12px 0 #ffe08a; animation: twinkle .6s steps(2) infinite; }
+img.pixel { image-rendering: pixelated; }
+.hud-portrait img, .farmer-av img, .dlg-face img { width: 100%; height: 100%; }
+.shop-art .sprite, .seedcard-art .sprite, .codex-art .sprite { width: 100%; height: 100%; }
+.credit { font-size: 9px; opacity: .65; margin-top: 14px; text-transform: none; }
