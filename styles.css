@@ -1,0 +1,297 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Stardew-inspired cozy retro: spring palette, parchment + wood, strong outlines */
+body {
+  margin: 0; font-family: "Courier New", Courier, monospace; font-weight: bold;
+  letter-spacing: .3px; color: #3a2b1a;
+  background: #8fd16a;
+  background-image:
+    repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%);
+  background-size: 28px 28px;
+  padding-bottom: 96px; max-width: 480px; margin-left: auto; margin-right: auto; min-height: 100vh;
+}
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(58,43,26,.25) 100%); }
+/* wooden HUD sign */
+.topbar { position: sticky; top: 8px; z-index: 5; margin: 8px 10px 0; display: flex;
+  justify-content: space-between; align-items: center; padding: 10px 12px;
+  background: linear-gradient(180deg,#a06a3b,#7a4e28); border: 4px solid #3a2b1a;
+  box-shadow: 4px 4px 0 rgba(58,43,26,.5); border-radius: 6px; }
+.topbar::before, .topbar::after { content: ""; width: 8px; height: 8px; background: #2b1e12;
+  border-radius: 50%; position: absolute; top: 50%; margin-top: -4px; }
+.topbar::before { left: 4px; } .topbar::after { right: 4px; }
+.brand { font-size: 20px; color: #ffcc33; text-shadow: 2px 2px 0 #3a2b1a; margin: 0 10px; }
+.stats { display: flex; gap: 6px; }
+.pill { background: #fdf6d8; color: #3a2b1a; font-size: 12px; padding: 5px 8px;
+  border: 3px solid #3a2b1a; border-radius: 8px; box-shadow: 2px 2px 0 rgba(58,43,26,.6); }
+.pill.streak { background: #ff9f1c; color: #fff; text-shadow: 1px 1px 0 #3a2b1a; }
+.xpbar { height: 12px; background: #3a2b1a; margin: 8px 10px 0; border: 3px solid #3a2b1a; border-radius: 8px; overflow: hidden; }
+.xpbar div { height: 100%; width: 0%; background: repeating-linear-gradient(90deg,#7ed957 0 8px,#4da636 8px 16px); transition: width .25s steps(8); }
+.view { display: none; padding: 12px; }
+.view.active { display: block; }
+/* dirt tile plots with grass fringe */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.plot { border: 4px solid #3a2b1a; border-radius: 8px; background: #8a5a33;
+  background-image: repeating-conic-gradient(#8a5a33 0% 25%, #7d502c 0% 50%);
+  background-size: 16px 16px;
+  padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; text-align: center; color: #fff; min-height: 158px; justify-content: flex-end;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,.3), inset 4px 4px 0 rgba(255,255,255,.2), 4px 4px 0 rgba(58,43,26,.5);
+  position: relative; overflow: hidden; }
+.plot::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 16px;
+  background: repeating-linear-gradient(90deg,#6abe30 0 8px,#5aa82a 8px 16px);
+  border-bottom: 4px solid #3a2b1a; }
+.plot.empty { background: #9c6b3d; border-style: dashed; }
+.plot.ready { border-color: #ffcc33; box-shadow: inset -4px -4px 0 rgba(0,0,0,.3), 0 0 12px #ffcc33, 4px 4px 0 rgba(58,43,26,.5); }
+.plot.thirsty { border-color: #3a9ad9; }
+.plot.wilted { filter: sepia(.45) saturate(.8); }
+.plot.dead { filter: grayscale(.7) brightness(.85); }
+.plot.locked { background: #6b6b6b; }
+.plot .art { width: 68px; height: 68px; margin-top: 20px; z-index: 1;
+  background: rgba(255,255,255,.18); border: 3px solid rgba(58,43,26,.55); border-radius: 8px; padding: 2px; }
+.plot .art svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.plot.ready .art { animation: readybounce .8s steps(2) infinite; border-color: #ffcc33; background: rgba(255,204,51,.3); }
+@keyframes readybounce { 0% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.plot .sway { animation: idlebob 2.4s steps(2) infinite; }
+@keyframes idlebob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+@keyframes pop { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes droop { 0%,100% { transform: translateX(0); } 50% { transform: translateX(-2px); } }
+.plot.thirsty .art { animation: droop .5s steps(2) infinite; }
+.plot .cname { font-size: 11px; background: #3a2b1a; color: #ffd97a; padding: 3px 7px; z-index: 1; border-radius: 6px; }
+.plot .stage { font-size: 10px; background: #fdf6d8; color: #3a2b1a; padding: 3px 7px; z-index: 1; border: 2px solid #3a2b1a; border-radius: 6px; }
+.plot.ready .stage { background: #ffcc33; animation: readybounce .8s steps(2) infinite; }
+.plot .bar { height: 10px; width: 100%; background: #3a2b1a; border: 2px solid #3a2b1a; border-radius: 6px; overflow: hidden; z-index: 1; }
+.plot .bar i { display: block; height: 100%; background: repeating-linear-gradient(90deg,#7ed957 0 5px,#4da636 5px 8px); }
+.plot .badges { display: flex; gap: 4px; z-index: 1; min-height: 20px; flex-wrap: wrap; justify-content: center; }
+.badge { font-size: 10px; padding: 2px 6px; background: #3a2b1a; color: #fff; border: 2px solid #fdf6d8; border-radius: 6px; }
+.badge.water { background: #3a9ad9; }
+.badge.weed { background: #4da636; }
+.badge.boost { background: #ffcc33; color: #3a2b1a; border-color: #3a2b1a; }
+/* parchment panels */
+.away, .tip { background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a; border-radius: 8px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); }
+.away { padding: 10px; margin-bottom: 10px; font-size: 12px; }
+.tip { padding: 8px 10px; font-size: 12px; }
+.hidden { display: none; }
+/* wooden tab bar */
+.tabbar { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px);
+  max-width: 460px; display: flex; background: linear-gradient(180deg,#a06a3b,#7a4e28);
+  border: 4px solid #3a2b1a; border-radius: 12px; overflow: hidden; box-shadow: 4px 4px 0 rgba(58,43,26,.5);
+  padding-bottom: env(safe-area-inset-bottom); }
+.tabbar button { flex: 1; padding: 12px 0; background: none; border: 0; border-right: 3px solid #3a2b1a;
+  color: #f0dcae; font-family: inherit; font-size: 13px; border-radius: 0; box-shadow: none; text-transform: uppercase; }
+.tabbar button:last-child { border-right: 0; }
+.tabbar button.active { color: #3a2b1a; background: #ffcc33; }
+.sheet { position: fixed; inset: 0; background: rgba(58,43,26,.6); display: flex; align-items: flex-end; justify-content: center; z-index: 20; }
+.sheet-box { width: 100%; max-width: 480px; background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a;
+  border-bottom: 0; border-radius: 14px 14px 0 0; padding: 14px 14px 34px; box-shadow: 0 -6px 0 rgba(58,43,26,.4); }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.sheet-art { display: flex; justify-content: center; padding: 8px; margin: 6px 0;
+  background: repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%); background-size: 20px 20px;
+  border: 4px solid #3a2b1a; border-radius: 8px; }
+.sheet-art svg { width: 96px; height: 96px; image-rendering: pixelated; background: rgba(253,246,216,.7); border: 3px solid #3a2b1a; border-radius: 6px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+button { border: 3px solid #3a2b1a; box-shadow: 3px 3px 0 rgba(58,43,26,.6); padding: 10px 12px;
+  font-family: inherit; font-size: 13px; cursor: pointer; background: #fdf6d8; color: #3a2b1a;
+  border-radius: 8px; text-transform: uppercase; }
+button:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(58,43,26,.6); }
+button:disabled { opacity: .45; }
+.primary { background: #4da636; color: #fff; text-shadow: 1px 1px 0 #3a2b1a; width: 100%; margin-top: 12px; }
+.danger { background: #c0392b; color: #fff; }
+.card { background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a; border-radius: 10px;
+  box-shadow: 3px 3px 0 rgba(58,43,26,.5); padding: 12px; line-height: 1.7; font-size: 13px; }
+.card b { color: #7a4e28; }
+.muted { opacity: .7; font-size: 12px; }
+.shop-item { display: flex; gap: 8px; align-items: center; background: #fdf6d8; color: #3a2b1a;
+  border: 4px solid #3a2b1a; border-radius: 10px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); padding: 8px; margin-bottom: 10px; }
+.shop-art { width: 52px; height: 52px; flex-shrink: 0;
+  background: repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%); background-size: 14px 14px;
+  border: 3px solid #3a2b1a; border-radius: 6px; }
+.shop-art svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.task { background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a; border-radius: 10px;
+  box-shadow: 3px 3px 0 rgba(58,43,26,.5); padding: 10px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; font-size: 12px; }
+h2, h3 { color: #3a2b1a; background: #ffcc33; display: inline-block; padding: 4px 12px;
+  border: 3px solid #3a2b1a; border-radius: 8px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); font-size: 15px; }
+
+/* ---- awesome pass: scene, packets, board, icons, motion ---- */
+.scene-wrap { position: relative; border: 4px solid #3a2b1a; border-radius: 10px; overflow: hidden; box-shadow: 4px 4px 0 rgba(58,43,26,.5); background: #8fd3ff; }
+.scene { display: block; width: 100%; height: 84px; }
+.scene svg { width: 100%; height: 100%; display: block; }
+.scene-wrap::before { content: ""; position: absolute; top: 14px; left: -60px; width: 46px; height: 12px; background: #fff; box-shadow: 10px 4px 0 #fff, 24px 0 0 #fff; opacity: .9; animation: drift 14s linear infinite; }
+.scene-wrap::after { content: ""; position: absolute; top: 34px; left: -80px; width: 34px; height: 9px; background: rgba(255,255,255,.85); box-shadow: 8px 3px 0 rgba(255,255,255,.85); animation: drift 22s linear infinite; }
+@keyframes drift { to { transform: translateX(560px); } }
+.daylabel { position: absolute; top: 6px; right: 6px; background: #3a2b1a; color: #ffcc33; font-size: 11px; padding: 4px 8px; border: 2px solid #ffcc33; border-radius: 6px; }
+.mini { display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 3px; }
+.mini svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.mini.big { width: 24px; height: 24px; }
+.art.wet { background: rgba(58,150,220,.22); }
+.art.dry { background: rgba(255,255,255,.18); }
+.plot.thirsty .art { outline: 3px dashed #3a9ad9; outline-offset: -3px; }
+.packet-art { text-align: center; }
+.packet-top { background: #3a2b1a; color: #ffcc33; font-size: 10px; padding: 3px 6px; border-radius: 6px 6px 0 0; }
+.packet-art .shop-art { border-radius: 0; width: 56px; height: 56px; margin: 0 auto; }
+.packet-price { background: #ffcc33; border: 3px solid #3a2b1a; border-top: 0; font-size: 11px; border-radius: 0 0 6px 6px; padding: 1px 0; }
+.shop-item.packet { align-items: stretch; }
+.boost-art { display: flex; align-items: center; justify-content: center; }
+.task { position: relative; }
+.task .pin { position: absolute; top: -6px; left: 50%; width: 12px; height: 12px; background: #c0392b; border: 3px solid #3a2b1a; border-radius: 50%; }
+.task.done { background: #d8f3c6; }
+.farmer { display: flex; gap: 12px; align-items: center; }
+.farmer-av { width: 64px; height: 64px; background: repeating-conic-gradient(#8fd16a 0% 25%, #84c45f 0% 50%); background-size: 16px 16px; border: 4px solid #3a2b1a; border-radius: 8px; flex-shrink: 0; }
+.farmer-av svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.plot.ready .stage::after { content: " ★"; color: #7a4e28; animation: twinkle .6s steps(2) infinite; }
+@keyframes twinkle { 50% { opacity: .2; } }
+.xpbar div { position: relative; }
+button { transition: transform .05s steps(2); }
+.plot { transition: transform .08s steps(2); }
+.plot:active { transform: scale(.96); }
+
+/* critique fixes: tab icons, action colors */
+.tabbar button::before { content: ""; display: block; width: 14px; height: 14px; margin: 0 auto 3px; border: 3px solid currentColor; }
+.tabbar button[data-view="farm"]::before { background: #4da636; }
+.tabbar button[data-view="shop"]::before { background: #ffcc33; }
+.tabbar button[data-view="tasks"]::before { background: #fdf6d8; border-radius: 50%; }
+.tabbar button[data-view="you"]::before { background: #3a9ad9; }
+.btn-water { background: #3a9ad9; color: #fff; }
+.btn-harv { background: #ffcc33; color: #3a2b1a; }
+.btn-fert { background: #4da636; color: #fff; }
+.btn-clear { background: #777; color: #fff; }
+.btn-weed { background: #2d7a33; color: #fff; }
+.pill .mini { width: 14px; height: 14px; margin-right: 2px; }
+
+/* UX cleanup: seed cards, debug, readability */
+.seedcards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seedcard { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; background: #fff; }
+.seedcard-art { width: 48px; height: 48px; }
+.seedcard-art svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.seedcard-name { font-size: 13px; }
+.seedcard-sub { font-size: 10px; font-weight: normal; opacity: .8; text-transform: none; }
+.debug { background: rgba(58,43,26,.08); border: 3px dashed #3a2b1a; border-radius: 8px; padding: 8px 10px; margin: 12px 0; }
+.debug summary { cursor: pointer; font-size: 13px; }
+.plot .cname { font-size: 12px; }
+.plot .stage { font-size: 11px; }
+#reset { margin-top: 12px; }
+
+/* ===== REAL FARM: one fenced tilled field, mound plots, plant-marker signs ===== */
+#view-farm { position: relative; }
+.grid {
+  position: relative; margin-top: 26px; padding: 14px 10px 18px;
+  background: #6b4426;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 3px, transparent 3px 12px),
+    repeating-conic-gradient(#75502c 0% 25%, #6b4426 0% 50%);
+  background-size: auto, 24px 24px;
+  border: 6px solid #4a3320; border-radius: 10px;
+  box-shadow: inset 0 0 0 3px #8a5f3c, 4px 4px 0 rgba(58,43,26,.5);
+}
+/* wooden farm sign above field */
+.grid::before { content: "SUNNY ACRES"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(180deg,#a06a3b,#7a4e28); color: #ffcc33; font-size: 13px; padding: 4px 16px;
+  border: 4px solid #3a2b1a; border-radius: 8px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); white-space: nowrap; z-index: 2; }
+/* fence posts along the top rail */
+.grid::after { content: ""; position: absolute; top: -11px; left: 8px; right: 8px; height: 8px;
+  background-image: repeating-linear-gradient(90deg, #4a3320 0 10px, transparent 10px 34px); opacity: .9; pointer-events: none; }
+/* wildflowers along the field base */
+#view-farm::after { content: ""; position: absolute; bottom: 2px; left: 22px; width: 7px; height: 7px;
+  background: #ff6b9d; border-radius: 50%;
+  box-shadow: 16px 5px 0 #ffd93d, 34px 2px 0 #fff, 200px 4px 0 #ffd93d, 222px 1px 0 #ff6b9d, 250px 5px 0 #fff, 320px 3px 0 #ffd93d; opacity: .9; pointer-events: none; }
+/* mound plots: no more tiles */
+.plot { background: transparent; border: 0; box-shadow: none; min-height: 172px; padding: 2px; overflow: visible; }
+.plot::before { display: none; }
+/* soil mound under each crop */
+.plot::after { content: ""; position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
+  width: 86%; height: 34px; background: radial-gradient(ellipse at center, #8a5f3c 0 55%, #5a3a20 56% 100%);
+  border-radius: 50%; z-index: 0; }
+.plot.empty::after { background: radial-gradient(ellipse at center, transparent 0 62%, #3d2b1a 63% 68%, transparent 69%);
+  border: 3px dashed rgba(253,246,216,.7); height: 38px; }
+.plot.locked::after { background: radial-gradient(ellipse at center, #5aa82a 0 55%, #3f7a24 56% 100%); border-radius: 50%; }
+.plot.ready::after { background: radial-gradient(ellipse at center, #9c6b3d 0 55%, #6b4426 56% 100%);
+  box-shadow: 0 0 12px #ffcc33; }
+.plot.thirsty::after { background: radial-gradient(ellipse at center, #a57645 0 55%, #6b4426 56% 100%); }
+.plot .art { width: 78px; height: 78px; margin-top: 6px; background: transparent; border: 0; z-index: 1; }
+.plot.ready .art { background: transparent; border: 0; }
+.plot.thirsty .art { outline: 0; }
+.plot .art svg { filter: drop-shadow(0 3px 0 rgba(0,0,0,.35)); }
+/* plant-marker stake signs */
+.plot .cname { background: linear-gradient(180deg,#a06a3b,#7a4e28); color: #ffe9a8; border: 3px solid #3a2b1a; border-radius: 4px; font-size: 11px; padding: 2px 8px; margin-top: -6px; box-shadow: 2px 2px 0 rgba(0,0,0,.4); }
+.plot .stage { border-radius: 4px; }
+.plot .bar { width: 86%; border-radius: 4px; }
+.plot .badges { min-height: 20px; }
+.plot.locked .cname { background: #3a3a3a; color: #ccc; }
+.plot.empty, .plot.locked, .plot.dead, .plot.wilted, .plot.ready, .plot.thirsty { background: transparent; border: 0; }
+.plot.locked .art { background: transparent; border: 0; }
+
+/* ===== RPG chrome: HUD portrait, dialogue, quests, codex, floaters ===== */
+.hud-portrait { width: 38px; height: 38px; background: #8fd16a; border: 3px solid #ffcc33; border-radius: 6px; flex-shrink: 0; margin-left: 8px; }
+.hud-portrait svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.brand { margin: 0 4px; }
+#view-farm .tip, #view-farm .away { display: flex; gap: 8px; align-items: flex-start; background: #1c2b1a; color: #fdf6d8; border-color: #fdf6d8; }
+.dlg-face { width: 40px; height: 40px; flex-shrink: 0; background: #8fd16a; border: 3px solid #fdf6d8; border-radius: 6px; }
+.dlg-face svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.dlg-body { flex: 1; }
+.dlg-name { display: block; color: #ffcc33; font-size: 10px; margin-bottom: 2px; }
+.dlg-cursor { width: 10px; height: 10px; background: #ffcc33; align-self: flex-end; animation: twinkle .6s steps(2) infinite; flex-shrink: 0; }
+.task.quest { align-items: center; gap: 8px; }
+.quest-main { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.quest-giver { font-size: 10px; color: #7a4e28; }
+.quest-reward { font-size: 10px; color: #2d7a33; }
+.codex { background: #fdf6d8; border: 4px solid #3a2b1a; border-radius: 10px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); padding: 10px; margin-top: 10px; }
+.codex h3 { margin: 6px 0; }
+.statrows { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
+.statrows div { background: #1c2b1a; color: #7ed957; border: 3px solid #3a2b1a; border-radius: 6px; padding: 4px 8px; }
+.codex-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+.codex-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; background: #fff; border: 3px solid #3a2b1a; border-radius: 6px; padding: 4px 2px; }
+.codex-item.locked { filter: grayscale(1); opacity: .6; }
+.codex-art { width: 36px; height: 36px; }
+.codex-art svg { width: 100%; height: 100%; image-rendering: pixelated; }
+.floater { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1c2b1a; color: #ffcc33;
+  border: 3px solid #ffcc33; border-radius: 8px; padding: 6px 12px; font-size: 14px; z-index: 99;
+  animation: floatup 1.4s steps(12) forwards; pointer-events: none; }
+.floater.big { font-size: 18px; background: #ffcc33; color: #3a2b1a; border-color: #3a2b1a; }
+@keyframes floatup { to { transform: translate(-50%, -46px); opacity: 0; } }
+
+/* ===== prettier pass: pixel type, living sky, weather, critters ===== */
+body { font-family: "Press Start 2P", "Courier New", monospace; font-size: 11px; line-height: 1.6; }
+button, .pill, .plot .cname, .plot .stage, .badge { font-family: inherit; }
+.brand { font-size: 15px; }
+h2, h3 { font-size: 12px; }
+.plot .cname { font-size: 9px; }
+.plot .stage { font-size: 9px; }
+.badge { font-size: 8px; }
+.tabbar button { font-size: 10px; }
+.tip, .away { font-size: 10px; }
+/* living sky tint per phase (filters only on non-fixed subtrees; never on body) */
+body[data-phase="dawn"] .scene { filter: hue-rotate(-14deg) saturate(1.15); }
+body[data-phase="dusk"] .scene { filter: sepia(.3) hue-rotate(-20deg) saturate(1.25); }
+body[data-phase="dawn"] #view-farm, body[data-phase="dusk"] #view-farm { filter: saturate(1.08); }
+body[data-phase="night"] .scene { filter: brightness(.55) hue-rotate(25deg); }
+body[data-phase="night"] #view-farm { filter: brightness(.88); }
+body[data-phase="night"] .daylabel { background: #101c3a; color: #cfe4ff; border-color: #cfe4ff; }
+/* stars at night over the farm */
+body[data-phase="night"] #view-farm::before { content: ""; position: absolute; top: 0; left: 14px; width: 3px; height: 3px;
+  background: #fff; box-shadow: 40px 8px 0 #fff, 90px 3px 0 #cfe4ff, 150px 10px 0 #fff, 210px 4px 0 #cfe4ff,
+  260px 9px 0 #fff, 310px 5px 0 #fff, 120px 14px 0 #cfe4ff, 60px 16px 0 #fff; z-index: 3; pointer-events: none;
+  animation: twinkle 1.2s steps(2) infinite; }
+/* butterfly by day */
+body[data-phase="day"] #view-farm::before, body[data-phase="dawn"] #view-farm::before, body[data-phase="dusk"] #view-farm::before {
+  content: ""; position: absolute; top: 120px; left: -12px; width: 8px; height: 6px; background: #ff9ff3;
+  border: 2px solid #3a2b1a; z-index: 3; pointer-events: none; animation: flutter 9s linear infinite; }
+@keyframes flutter { 0% { transform: translate(0,0); } 25% { transform: translate(110px,-26px); }
+  50% { transform: translate(230px,6px); } 75% { transform: translate(330px,-20px); } 100% { transform: translate(480px,0); } }
+/* rain overlay */
+body[data-weather="rain"] .scene-wrap::before { background: #9db3c8; box-shadow: 10px 4px 0 #9db3c8, 24px 0 0 #9db3c8; }
+body[data-weather="rain"] .grid { box-shadow: inset 0 0 0 3px #8a5f3c, 4px 4px 0 rgba(58,43,26,.5), inset 0 -26px 0 rgba(58,154,219,.12); }
+body[data-weather="cloudy"] .scene-wrap::before, body[data-weather="cloudy"] .scene-wrap::after { opacity: 1; }
+/* thirsty ripple */
+.plot.thirsty .bar { outline: 2px dashed #3a9ad9; outline-offset: 1px; }
+
+/* review fixes: rain drops, weed warning, task progress, water-all */
+body[data-weather="rain"] .scene-wrap::after { background: rgba(120,160,200,.7); }
+body[data-weather="rain"] #view-farm::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 4;
+  background-image: repeating-linear-gradient(105deg, transparent 0 14px, rgba(180,220,255,.35) 14px 15px, transparent 15px 26px);
+  animation: rainfall .5s linear infinite; }
+@keyframes rainfall { to { background-position: -26px 52px; } }
+.plot .badges .badge.weed { animation: weedpulse 1s steps(2) infinite; }
+@keyframes weedpulse { 50% { transform: scale(1.15); } }
+.task .quest-bar { height: 6px; background: #3a2b1a; border-radius: 4px; margin-top: 4px; overflow: hidden; }
+.task .quest-bar i { display: block; height: 100%; background: #4da636; }
+.waterall { background: #3a9ad9; color: #fff; width: 100%; margin-top: 10px; }

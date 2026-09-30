@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>SimFarm - Daily Farm</title>
+<meta name="theme-color" content="#2d5a27" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div id="hudPortrait" class="hud-portrait"></div>
+  <div class="brand">SimFarm</div>
+  <div class="stats">
+    <div class="pill" id="coins">100c</div>
+    <div class="pill" id="level">Lv 1</div>
+    <div class="pill streak" id="streak">1 day</div>
+  </div>
+</header>
+
+<div class="xpbar"><div id="xpfill"></div></div>
+
+<main id="view-farm" class="view active">
+  <div class="scene-wrap"><div id="scene" class="scene"></div><div id="dayLabel" class="daylabel">SPRING DAY 1</div></div>
+  <div id="awayMsg" class="away hidden"></div>
+  <div id="tip" class="tip"></div>
+  <button id="waterAll" class="waterall">Water all thirsty crops</button>
+  <div id="grid" class="grid"></div>
+</main>
+
+<main id="view-shop" class="view">
+  <h2>Seed Shop</h2>
+  <div id="shopList"></div>
+  <h2>Supplies</h2>
+  <div id="supplyList"></div>
+</main>
+
+<main id="view-tasks" class="view">
+  <h2>Daily Tasks</h2>
+  <p class="muted">Resets every day. Take care of your farm!</p>
+  <div id="taskList"></div>
+  <button id="claimStreak" class="primary">Claim daily bonus</button>
+</main>
+
+<main id="view-you" class="view">
+  <h2>Your Farmer</h2>
+  <div class="card farmer">
+    <div id="farmerAv" class="farmer-av"></div>
+    <div>
+    <div>Level: <b id="pLevel">1</b></div>
+    <div>XP: <b id="pXp">0</b></div>
+    <div>Coins: <b id="pCoins">0</b></div>
+    <div>Streak: <b id="pStreak">0</b> days</div>
+    <div>Harvested total: <b id="pHarvest">0</b></div>
+    </div>
+  </div>
+  <h3>Help</h3>
+  <ol class="muted">
+    <li>Seeds are FREE - plant in empty plots.</li>
+    <li>Water every 12-24h or crops wilt, then wither.</li>
+    <li>Harvest when READY for coins. Dry harvests pay half.</li>
+    <li>Come back daily to keep streak. Higher level unlocks crops.</li>
+  </ol>
+  <details class="debug">
+    <summary>Testing tools (time travel)</summary>
+    <div class="row">
+      <button id="ff8">+8 hours</button>
+      <button id="ff24">+1 day</button>
+    </div>
+    <p class="muted">Skips ahead to test the daily loop. Real crops take 2-7 days.</p>
+  </details>
+  <button id="reset" class="danger">Reset farm</button>
+</main>
+
+<nav class="tabbar">
+  <button data-view="farm" class="active">Farm</button>
+  <button data-view="shop">Shop</button>
+  <button data-view="tasks">Tasks</button>
+  <button data-view="you">You</button>
+</nav>
+
+<div id="sheet" class="sheet hidden">
+  <div class="sheet-box">
+    <div class="sheet-head">
+      <h3 id="sheetTitle">Plot</h3>
+      <button id="sheetClose">X</button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
