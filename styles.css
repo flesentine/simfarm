@@ -314,3 +314,31 @@ img.pixel { image-rendering: pixelated; }
 .plot, .plot * { cursor: pointer; }
 .plot, .tabbar button, .seedcard { touch-action: manipulation; -webkit-tap-highlight-color: rgba(255,204,51,.4); }
 .btn-sprink { background: #2176ae; color: #fff; }
+
+/* ===== 3D isometric dioramas: diamond tiles + floating crops + flat signs ===== */
+.plot { position: relative; background: transparent; border: 0; box-shadow: none;
+  min-height: 204px; padding: 2px; overflow: visible; }
+.plot::after { display: none; }
+.plot .art { width: 64px; height: 64px; margin: 0; background: transparent; border: 0; padding: 0; }
+.plot .art svg { filter: drop-shadow(-3px 4px 0 rgba(0,0,0,.35)); }
+.diamond { position: relative; width: 88px; height: 88px; margin: 64px auto 0;
+  transform: rotate(45deg) scale(.92, .46);
+  background: linear-gradient(180deg, #b57e45 0%, #7d502c 55%, #4a3320 100%);
+  box-shadow: 0 7px 0 #4a3320, 0 14px 0 #33241a, 0 18px 10px rgba(0,0,0,.45); }
+.diamond .mound { position: absolute; inset: 20%; border-radius: 50%;
+  background: linear-gradient(180deg, #c08a4e 0%, #8a5a33 50%, #54341c 100%); }
+.plot.empty .diamond .mound { background: transparent; border: 3px dashed rgba(253,246,216,.8); }
+.plot.locked .diamond { background: linear-gradient(180deg, #6abe30 0%, #5aa82a 55%, #3f7a24 100%); }
+.plot.locked .diamond .mound { background: linear-gradient(180deg, #548c28 0%, #467a20 100%); }
+.plot.ready .diamond { box-shadow: 0 7px 0 #4a3320, 0 14px 0 #33241a, 0 0 16px #ffcc33, 0 18px 10px rgba(0,0,0,.45); }
+.plot.ready .diamond .mound { background: linear-gradient(180deg, #d09a55 0%, #9c6b3d 50%, #6b4426 100%); }
+.plot.thirsty .diamond { outline: 3px dashed #2176ae; outline-offset: 3px; }
+.plot.thirsty .diamond .mound { background: linear-gradient(180deg, #c09a5c 0%, #a57645 50%, #6b4426 100%); }
+.plot.wilted .diamond, .plot.dead .diamond { filter: sepia(.4) brightness(.9); }
+.cropX { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; pointer-events: none;
+  filter: drop-shadow(-3px 5px 0 rgba(0,0,0,.3)); }
+.plot.ready .cropX { animation: cropbob .8s steps(2) infinite; }
+.plot.ready .art { animation: none; background: transparent; border: 0; }
+@keyframes cropbob { 0% { margin-bottom: 0; } 50% { margin-bottom: 6px; } }
+.plot .cname, .plot .stage, .plot .bar, .plot .badges { position: relative; z-index: 3; }
+.plot .cname { margin-top: 26px; }

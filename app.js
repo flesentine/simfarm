@@ -376,19 +376,27 @@ function renderGrid() {
     if (info.state === 'ready-thirsty') cls = 'ready thirsty';
     else if ((info.state === 'seed' || info.state === 'sprout' || info.state === 'growing') && info.needsWater) cls = 'thirsty';
     b.className = 'plot ' + cls;
+    // isometric diorama: diamond tile + floating crop + flat wooden signs
+    const sizeFor = (st) => ({
+      seed: [0.78, 86], sprout: [0.88, 94], growing: [1, 102], ready: [1.1, 110],
+      'ready-thirsty': [1.1, 110], wilted: [0.95, 96], dead: [0.9, 92], empty: [0.7, 84], locked: [0.7, 84],
+    }[st] || [1, 100]);
     if (!p.unlocked) {
       b.classList.add('locked');
-      b.innerHTML = `<div class="art">${cropArt(null, 'locked')}</div><div class="cname">Locked</div><div class="stage">${UNLOCK_COST[i] || 300}c to open</div>`;
+      const [sc, bh] = sizeFor('locked');
+      b.innerHTML = `<div class="diamond"><div class="mound"></div></div><div class="cropX" style="bottom:${bh}px"><div class="art" style="transform:scale(${sc})">${cropArt(null, 'locked')}</div></div><div class="cname">Locked</div><div class="stage">${UNLOCK_COST[i] || 300}c to open</div>`;
     } else if (!p.cropId) {
-      b.innerHTML = `<div class="art">${cropArt(null, 'empty', false)}</div><div class="cname">Empty soil</div><div class="stage">TAP TO PLANT</div>`;
+      const [sc, bh] = sizeFor('empty');
+      b.innerHTML = `<div class="diamond"><div class="mound"></div></div><div class="cropX" style="bottom:${bh}px"><div class="art" style="transform:scale(${sc})">${cropArt(null, 'empty', false)}</div></div><div class="cname">Empty soil</div><div class="stage">TAP TO PLANT</div>`;
     } else {
       const def = CROPS[p.cropId];
       const pct = Math.round(info.progress * 100);
       const wet = !info.needsWater;
       const artStage = info.state === 'dead' ? 'dead' : info.state === 'wilted' ? 'wilted' : info.state === 'ready-thirsty' ? 'ready' : info.state;
+      const [sc, bh] = sizeFor(info.state);
       const hpRow = info.state === 'dead' ? '<span class="badge hp">WITHERED</span>' : `<span class="badge hp"><i class="mini">${iconArt('heart')}</i>${Math.round(p.health)}</span>`;
       const badges = `${info.needsWater && !p.dead ? `<span class="badge water"><i class="mini">${iconArt('drop')}</i>WATER</span>` : ''}${p.weed ? `<span class="badge weed"><i class="mini">${iconArt('weed')}</i>WEED</span>` : ''}${fertActive(p, now) ? `<span class="badge boost"><i class="mini">${iconArt('boost')}</i>BOOST</span>` : ''}${p.sprinkler ? `<span class="badge boost"><i class="mini">${iconArt('drop')}</i>AUTO</span>` : ''}${hpRow}`;
-      b.innerHTML = `<div class="art ${wet ? 'wet' : 'dry'}">${cropArt(p.cropId, artStage, wet, info.progress)}</div>
+      b.innerHTML = `<div class="diamond"><div class="mound"></div></div><div class="cropX" style="bottom:${bh}px"><div class="art ${wet ? 'wet' : 'dry'}" style="transform:scale(${sc})">${cropArt(p.cropId, artStage, wet, info.progress)}</div></div>
         <div class="cname">${def.name}</div>
         <div class="stage">${stageLabel(info)} ${pct}%</div>
         <div class="bar"><i style="width:${pct}%"></i></div>
