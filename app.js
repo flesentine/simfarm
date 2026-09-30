@@ -355,7 +355,15 @@ function render() {
   const now = Date.now();
   let thirsty = 0, ready = 0, dead = 0, planted = 0;
   S.plots.forEach(p => { if (p.cropId) planted++; const i = plotInfo(p, now); if (i.state === 'dead') dead++; else if (i.state.startsWith('ready')) ready++; else if (i.needsWater) thirsty++; });
-  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Wheat (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : S.lastRain === todayStr(new Date(now)) ? 'Rainy day in the Vale - clouds watered your crops free!' : 'All crops look good. Check back tomorrow.';
+  const idleTips = [
+    'All crops look good. Check back tomorrow.',
+    'The scarecrow is watching over your field. All quiet.',
+    'Healthy soil, happy crops. Nice work, farmer.',
+    'Bees visited while you were away. They approve.',
+    'A sunny day in the Vale. Perfect growing weather.',
+  ];
+  const idle = idleTips[Math.abs([...todayStr(new Date(now))].reduce((a, c) => a + c.charCodeAt(0), 0)) % idleTips.length];
+  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Wheat (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : S.lastRain === todayStr(new Date(now)) ? 'Rainy day in the Vale - clouds watered your crops free!' : idle;
   $('tip').innerHTML = `<span class="dlg-face">${scarecrowArt()}</span><span class="dlg-body"><span class="dlg-name">SCARECROW</span>${tipTxt}</span><span class="dlg-cursor"></span>`;
 }
 
