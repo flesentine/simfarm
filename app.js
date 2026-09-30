@@ -200,6 +200,11 @@ function tick(now = Date.now()) {
     else if (S.lastVisitDate !== today) S.streak = 1;
     S.lastVisitDate = today;
     S.tasks = { date: today, water: 0, plant: 0, harvest: 0, claimed: false, paid: { water: false, plant: false, harvest: false } };
+    // rainy days water every living crop for free
+    if (dayWeather(today) === 'RAIN') {
+      S.lastRain = today;
+      S.plots.forEach(p => { if (p.unlocked && p.cropId && !p.dead) p.lastWateredAt = Math.max(p.lastWateredAt, now); });
+    }
     // daily weeds: 15% per growing plot
     S.plots.forEach(p => {
       if (p.unlocked && p.cropId && !p.dead && Math.random() < 0.15) p.weed = true;
@@ -234,7 +239,7 @@ function awaySummary() {
   });
   S.lastSeen = now; save();
   if (ready === 0 && thirsty === 0 && dead === 0) return '';
-  return `While you were away (${sinceH}h): ${ready} ready, ${thirsty} thirsty, ${dead} dead.`;
+  return `While you were away (${sinceH}h): ${ready} ready, ${thirsty} thirsty, ${dead} withered.`;
 }
 
 // --- actions ---
@@ -335,7 +340,7 @@ function render() {
   const now = Date.now();
   let thirsty = 0, ready = 0, dead = 0, planted = 0;
   S.plots.forEach(p => { if (p.cropId) planted++; const i = plotInfo(p, now); if (i.state === 'dead') dead++; else if (i.state.startsWith('ready')) ready++; else if (i.needsWater) thirsty++; });
-  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Wheat (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : 'All crops look good. Check back tomorrow.';
+  const tipTxt = planted === 0 ? 'Welcome, Sproutling! Seeds are FREE - tap an empty soil ring to plant Wheat (more crops unlock as you level up).' : dead > 0 ? `${dead} crop(s) withered. Tap it, then Clear.` : ready > 0 ? `${ready} crop(s) READY - tap to harvest!` : thirsty > 0 ? `${thirsty} crop(s) need water - look for blue WATER badges.` : S.lastRain === todayStr(new Date(now)) ? 'Rainy day in the Vale - clouds watered your crops free!' : 'All crops look good. Check back tomorrow.';
   $('tip').innerHTML = `<span class="dlg-face">${scarecrowArt()}</span><span class="dlg-body"><span class="dlg-name">SCARECROW</span>${tipTxt}</span><span class="dlg-cursor"></span>`;
 }
 
