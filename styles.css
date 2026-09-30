@@ -14,12 +14,13 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 /* wooden HUD sign */
 .topbar { position: sticky; top: 8px; z-index: 5; margin: 8px 10px 0; display: flex;
   justify-content: space-between; align-items: center; padding: 10px 12px;
-  background: linear-gradient(180deg,#a06a3b,#7a4e28); border: 4px solid #3a2b1a;
+  background: linear-gradient(180deg,#b57e45,#6b4426); border: 4px solid #3a2b1a;
   box-shadow: 4px 4px 0 rgba(58,43,26,.5); border-radius: 6px; }
 .topbar::before, .topbar::after { content: ""; width: 8px; height: 8px; background: #2b1e12;
   border-radius: 50%; position: absolute; top: 50%; margin-top: -4px; }
 .topbar::before { left: 4px; } .topbar::after { right: 4px; }
-.brand { font-size: 20px; color: #ffcc33; text-shadow: 2px 2px 0 #3a2b1a; margin: 0 10px; }
+.brand { font-size: 20px; color: #ffcc33; margin: 0 10px;
+  text-shadow: -2px 0 0 #3a2b1a, 2px 0 0 #3a2b1a, 0 -2px 0 #3a2b1a, 0 2px 0 #3a2b1a, 3px 3px 0 #3a2b1a; }
 .stats { display: flex; gap: 6px; }
 .pill { background: #fdf6d8; color: #3a2b1a; font-size: 12px; padding: 5px 8px;
   border: 3px solid #3a2b1a; border-radius: 8px; box-shadow: 2px 2px 0 rgba(58,43,26,.6); }
@@ -42,7 +43,7 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
   border-bottom: 4px solid #3a2b1a; }
 .plot.empty { background: #9c6b3d; border-style: dashed; }
 .plot.ready { border-color: #ffcc33; box-shadow: inset -4px -4px 0 rgba(0,0,0,.3), 0 0 12px #ffcc33, 4px 4px 0 rgba(58,43,26,.5); }
-.plot.thirsty { border-color: #3a9ad9; }
+.plot.thirsty { border-color: #2176ae; }
 .plot.wilted { filter: sepia(.45) saturate(.8); }
 .plot.dead { filter: grayscale(.7) brightness(.85); }
 .plot.locked { background: #6b6b6b; }
@@ -63,8 +64,8 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .plot .bar i { display: block; height: 100%; background: repeating-linear-gradient(90deg,#7ed957 0 5px,#4da636 5px 8px); }
 .plot .badges { display: flex; gap: 4px; z-index: 1; min-height: 20px; flex-wrap: wrap; justify-content: center; }
 .badge { font-size: 10px; padding: 2px 6px; background: #3a2b1a; color: #fff; border: 2px solid #fdf6d8; border-radius: 6px; }
-.badge.water { background: #3a9ad9; }
-.badge.weed { background: #4da636; }
+.badge.water { background: #2176ae; }
+.badge.weed { background: #2d7a33; }
 .badge.boost { background: #ffcc33; color: #3a2b1a; border-color: #3a2b1a; }
 /* parchment panels */
 .away, .tip { background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a; border-radius: 8px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); }
@@ -73,7 +74,7 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .hidden { display: none !important; }
 /* wooden tab bar */
 .tabbar { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px);
-  max-width: 460px; display: flex; background: linear-gradient(180deg,#a06a3b,#7a4e28);
+  max-width: 460px; display: flex; background: linear-gradient(180deg,#b57e45,#6b4426);
   border: 4px solid #3a2b1a; border-radius: 12px; overflow: hidden; box-shadow: 4px 4px 0 rgba(58,43,26,.5);
   padding-bottom: env(safe-area-inset-bottom); }
 .tabbar button { flex: 1; padding: 12px 0; background: none; border: 0; border-right: 3px solid #3a2b1a;
@@ -95,7 +96,7 @@ button { border: 3px solid #3a2b1a; box-shadow: 3px 3px 0 rgba(58,43,26,.6); pad
   border-radius: 8px; text-transform: uppercase; }
 button:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(58,43,26,.6); }
 button:disabled { opacity: .45; }
-.primary { background: #4da636; color: #fff; text-shadow: 1px 1px 0 #3a2b1a; width: 100%; margin-top: 12px; }
+.primary { background: #357a28; color: #fff; text-shadow: 1px 1px 0 #3a2b1a; width: 100%; margin-top: 12px; }
 .danger { background: #c0392b; color: #fff; }
 .card { background: #fdf6d8; color: #3a2b1a; border: 4px solid #3a2b1a; border-radius: 10px;
   box-shadow: 3px 3px 0 rgba(58,43,26,.5); padding: 12px; line-height: 1.7; font-size: 13px; }
@@ -126,7 +127,7 @@ h2, h3 { color: #3a2b1a; background: #ffcc33; display: inline-block; padding: 4p
 .mini.big { width: 24px; height: 24px; }
 .plot .art.wet { background: rgba(58,150,220,.22); }
 .plot .art.dry { background: rgba(255,255,255,.18); }
-.plot.thirsty .art { outline: 3px dashed #3a9ad9; outline-offset: -3px; }
+.plot.thirsty .art { outline: 3px dashed #2176ae; outline-offset: -3px; }
 .packet-art { text-align: center; }
 .packet-top { background: #3a2b1a; color: #ffcc33; font-size: 10px; padding: 3px 6px; border-radius: 6px 6px 0 0; }
 .packet-art .shop-art { border-radius: 0; width: 56px; height: 56px; margin: 0 auto; }
@@ -151,10 +152,10 @@ button { transition: transform .05s steps(2); }
 .tabbar button[data-view="farm"]::before { background: #4da636; }
 .tabbar button[data-view="shop"]::before { background: #ffcc33; }
 .tabbar button[data-view="tasks"]::before { background: #fdf6d8; border-radius: 50%; }
-.tabbar button[data-view="you"]::before { background: #3a9ad9; }
-.btn-water { background: #3a9ad9; color: #fff; }
+.tabbar button[data-view="you"]::before { background: #2176ae; }
+.btn-water { background: #2176ae; color: #fff; }
 .btn-harv { background: #ffcc33; color: #3a2b1a; }
-.btn-fert { background: #4da636; color: #fff; }
+.btn-fert { background: #357a28; color: #fff; }
 .btn-clear { background: #777; color: #fff; }
 .btn-weed { background: #2d7a33; color: #fff; }
 .pill .mini { width: 14px; height: 14px; margin-right: 2px; }
@@ -186,7 +187,7 @@ button { transition: transform .05s steps(2); }
 }
 /* wooden farm sign above field */
 .grid::before { content: "SUNNY ACRES"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(180deg,#a06a3b,#7a4e28); color: #ffcc33; font-size: 13px; padding: 4px 16px;
+  background: linear-gradient(180deg,#b57e45,#6b4426); color: #ffcc33; font-size: 13px; padding: 4px 16px;
   border: 4px solid #3a2b1a; border-radius: 8px; box-shadow: 3px 3px 0 rgba(58,43,26,.5); white-space: nowrap; z-index: 2; }
 /* fence posts along the top rail */
 .grid::after { content: ""; position: absolute; top: -11px; left: 8px; right: 8px; height: 8px;
@@ -198,22 +199,22 @@ button { transition: transform .05s steps(2); }
 /* mound plots: no more tiles */
 .plot { background: transparent; border: 0; box-shadow: none; min-height: 172px; padding: 2px; overflow: visible; }
 .plot::before { display: none; }
-/* soil mound under each crop */
+/* soil mound: directional top-light (warm highlight above, cool shadow below) - never pillow-shaded */
 .plot::after { content: ""; position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
-  width: 86%; height: 34px; background: radial-gradient(ellipse at center, #8a5f3c 0 55%, #5a3a20 56% 100%);
+  width: 86%; height: 34px; background: linear-gradient(180deg, #c08a4e 0%, #8a5a33 45%, #4a3320 100%);
   border-radius: 50%; z-index: 0; }
-.plot.empty::after { background: radial-gradient(ellipse at center, transparent 0 62%, #3d2b1a 63% 68%, transparent 69%);
+.plot.empty::after { background: linear-gradient(180deg, transparent 0 62%, #3d2b1a 63% 68%, transparent 69%);
   border: 3px dashed rgba(253,246,216,.7); height: 38px; }
-.plot.locked::after { background: radial-gradient(ellipse at center, #5aa82a 0 55%, #3f7a24 56% 100%); border-radius: 50%; }
-.plot.ready::after { background: radial-gradient(ellipse at center, #9c6b3d 0 55%, #6b4426 56% 100%);
+.plot.locked::after { background: linear-gradient(180deg, #6abe30 0%, #5aa82a 45%, #3f7a24 100%); border-radius: 50%; }
+.plot.ready::after { background: linear-gradient(180deg, #c08a4e 0%, #9c6b3d 45%, #6b4426 100%);
   box-shadow: 0 0 12px #ffcc33; }
-.plot.thirsty::after { background: radial-gradient(ellipse at center, #a57645 0 55%, #6b4426 56% 100%); }
+.plot.thirsty::after { background: linear-gradient(180deg, #c09a5c 0%, #a57645 45%, #6b4426 100%); }
 .plot .art { width: 78px; height: 78px; margin-top: 6px; background: transparent; border: 0; z-index: 1; }
 .plot.ready .art { background: transparent; border: 0; }
 .plot.thirsty .art { outline: 0; }
 .plot .art svg { filter: drop-shadow(0 3px 0 rgba(0,0,0,.35)); }
 /* plant-marker stake signs */
-.plot .cname { background: linear-gradient(180deg,#a06a3b,#7a4e28); color: #ffe9a8; border: 3px solid #3a2b1a; border-radius: 4px; font-size: 11px; padding: 2px 8px; margin-top: -6px; box-shadow: 2px 2px 0 rgba(0,0,0,.4); }
+.plot .cname { background: linear-gradient(180deg,#b57e45,#6b4426); color: #ffe9a8; border: 3px solid #3a2b1a; border-radius: 4px; font-size: 11px; padding: 2px 8px; margin-top: -6px; box-shadow: 2px 2px 0 rgba(0,0,0,.4); }
 .plot .stage { border-radius: 4px; }
 .plot .bar { width: 86%; border-radius: 4px; }
 .plot .badges { min-height: 20px; }
@@ -283,7 +284,7 @@ body[data-weather="rain"] .scene-wrap::before { background: #9db3c8; box-shadow:
 body[data-weather="rain"] .grid { box-shadow: inset 0 0 0 3px #8a5f3c, 4px 4px 0 rgba(58,43,26,.5), inset 0 -26px 0 rgba(58,154,219,.12); }
 body[data-weather="cloudy"] .scene-wrap::before, body[data-weather="cloudy"] .scene-wrap::after { opacity: 1; }
 /* thirsty ripple */
-.plot.thirsty .bar { outline: 2px dashed #3a9ad9; outline-offset: 1px; }
+.plot.thirsty .bar { outline: 2px dashed #2176ae; outline-offset: 1px; }
 
 /* review fixes: rain drops, weed warning, task progress, water-all */
 body[data-weather="rain"] .scene-wrap::after { background: rgba(120,160,200,.7); }
@@ -295,7 +296,7 @@ body[data-weather="rain"] #view-farm::before { content: ""; position: absolute; 
 @keyframes weedpulse { 50% { transform: scale(1.15); } }
 .task .quest-bar { height: 6px; background: #3a2b1a; border-radius: 4px; margin-top: 4px; overflow: hidden; }
 .task .quest-bar i { display: block; height: 100%; background: #4da636; }
-.waterall { background: #3a9ad9; color: #fff; width: 100%; margin-top: 10px; }
+.waterall { background: #2176ae; color: #fff; width: 100%; margin-top: 10px; }
 
 /* ===== 16-bit CC0 sprites (josehzz crops, Kenney farmer) ===== */
 .sprite { display: inline-block; width: 64px; height: 64px; background-image: url("art/crops.png");
@@ -312,4 +313,4 @@ img.pixel { image-rendering: pixelated; }
   border: 3px solid #000; border-radius: 8px; padding: 8px; font-size: 11px; z-index: 99; }
 .plot, .plot * { cursor: pointer; }
 .plot, .tabbar button, .seedcard { touch-action: manipulation; -webkit-tap-highlight-color: rgba(255,204,51,.4); }
-.btn-sprink { background: #3a9ad9; color: #fff; }
+.btn-sprink { background: #2176ae; color: #fff; }
