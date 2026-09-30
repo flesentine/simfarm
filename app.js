@@ -3,10 +3,10 @@ const H = 3600e3;
 const DAY = 24 * H;
 
 const CROPS = {
-  lettuce: { id: 'lettuce', name: 'Lettuce', color: '#7ed957', buy: 5,  sell: 15,  xp: 10, growMs: 48*H,  waterMs: 18*H, minLevel: 1, desc: '2 days, easy' },
-  carrot:  { id: 'carrot',  name: 'Carrot',  color: '#ff9f1c', buy: 10, sell: 30,  xp: 20, growMs: 72*H,  waterMs: 18*H, minLevel: 2, desc: '3 days' },
-  tomato:  { id: 'tomato',  name: 'Tomato',  color: '#e63946', buy: 20, sell: 60,  xp: 35, growMs: 96*H,  waterMs: 12*H, minLevel: 3, desc: '4 days, thirsty' },
-  pumpkin: { id: 'pumpkin', name: 'Pumpkin', color: '#ff6b18', buy: 40, sell: 140, xp: 80, growMs: 168*H, waterMs: 24*H, minLevel: 5, desc: '7 days, valuable' },
+  lettuce: { id: 'lettuce', name: 'Lettuce', sell: 15,  xp: 10, growMs: 48*H,  waterMs: 18*H, minLevel: 1, desc: '2 days, easy' },
+  carrot:  { id: 'carrot',  name: 'Carrot',  sell: 30,  xp: 20, growMs: 72*H,  waterMs: 18*H, minLevel: 2, desc: '3 days' },
+  tomato:  { id: 'tomato',  name: 'Tomato',  sell: 60,  xp: 35, growMs: 96*H,  waterMs: 12*H, minLevel: 3, desc: '4 days, thirsty' },
+  pumpkin: { id: 'pumpkin', name: 'Pumpkin', sell: 140, xp: 80, growMs: 168*H, waterMs: 24*H, minLevel: 5, desc: '7 days, valuable' },
 };
 
 const UNLOCK_COST = { 6: 200, 7: 200, 8: 200, 9: 500, 10: 500, 11: 500 };
