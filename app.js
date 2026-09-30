@@ -114,7 +114,7 @@ function todayStr(d = new Date()) { return d.toISOString().slice(0, 10); }
 function defaultState() {
   const plots = [];
   for (let i = 0; i < 12; i++) {
-    plots.push({ unlocked: i < 6, cropId: null, plantedAt: 0, lastWateredAt: 0, fertilizedAt: 0, health: 100, dead: false, weed: false });
+    plots.push({ unlocked: i < 6, cropId: null, plantedAt: 0, lastWateredAt: 0, fertilizedAt: 0, health: 100, dead: false, weed: false, sprinkler: false });
   }
   return {
     coins: 100, xp: 0, level: 1,
@@ -136,6 +136,7 @@ function load() {
     if (!s.codex) s.codex = {};
     if (!s.stats) s.stats = { water: 0, plant: 0 };
     if (!s.tasks.paid) s.tasks.paid = { water: false, plant: false, harvest: false };
+    s.plots.forEach(p => { if (p.sprinkler === undefined) p.sprinkler = false; });
     // migrate pre-16bit crop ids to matching sprite crops (same stats)
     s.plots.forEach(p => { if (p.cropId && OLD_IDS[p.cropId]) p.cropId = OLD_IDS[p.cropId]; });
     Object.keys(OLD_IDS).forEach(old => {
@@ -210,6 +211,10 @@ function tick(now = Date.now()) {
       if (p.unlocked && p.cropId && !p.dead && Math.random() < 0.15) p.weed = true;
     });
   }
+  // sprinklers auto-water every living crop before decay is computed
+  S.plots.forEach(p => {
+    if (p.sprinkler && p.unlocked && p.cropId && !p.dead) p.lastWateredAt = Math.max(p.lastWateredAt, now);
+  });
   // health decay - scales with actual dry hours so offline neglect kills
   S.plots.forEach(p => {
     if (!p.unlocked || !p.cropId || p.dead) return;
@@ -314,6 +319,16 @@ function unlock(idx) {
   S.plots[idx].unlocked = true;
   save(); render(); return true;
 }
+function buySprinkler(idx) {
+  const p = S.plots[idx];
+  if (!p || !p.unlocked || !p.cropId || p.dead) { alert('Plant something living here first.'); return false; }
+  if (p.sprinkler) return true;
+  if (S.coins < 300) { alert(`Sprinkler costs 300c (have ${S.coins}c).`); return false; }
+  S.coins -= 300;
+  p.sprinkler = true;
+  floatText('Sprinkler installed!');
+  save(); render(); return true;
+}
 
 // --- UI ---
 const $ = id => document.getElementById(id);
@@ -366,7 +381,7 @@ function renderGrid() {
       const artStage = info.state === 'dead' ? 'dead' : info.state === 'wilted' ? 'wilted' : info.state === 'ready-thirsty' ? 'ready' : info.state;
       const hearts = Math.ceil(p.health / 20);
       const hpRow = info.state === 'dead' ? '<span class="badge hp">WITHERED</span>' : `<span class="badge hp" title="health">${'♥'.repeat(hearts)}${'♡'.repeat(5 - hearts)} ${Math.round(p.health)}</span>`;
-      const badges = `${info.needsWater && !p.dead ? `<span class="badge water"><i class="mini">${iconArt('drop')}</i>WATER</span>` : ''}${p.weed ? `<span class="badge weed"><i class="mini">${iconArt('weed')}</i>WEED</span>` : ''}${fertActive(p, now) ? `<span class="badge boost"><i class="mini">${iconArt('boost')}</i>BOOST</span>` : ''}${hpRow}`;
+      const badges = `${info.needsWater && !p.dead ? `<span class="badge water"><i class="mini">${iconArt('drop')}</i>WATER</span>` : ''}${p.weed ? `<span class="badge weed"><i class="mini">${iconArt('weed')}</i>WEED</span>` : ''}${fertActive(p, now) ? `<span class="badge boost"><i class="mini">${iconArt('boost')}</i>BOOST</span>` : ''}${p.sprinkler ? `<span class="badge boost"><i class="mini">${iconArt('drop')}</i>AUTO</span>` : ''}${hpRow}`;
       b.innerHTML = `<div class="art ${wet ? 'wet' : 'dry'}">${cropArt(p.cropId, artStage, wet, info.progress)}</div>
         <div class="cname">${def.name}</div>
         <div class="stage">${stageLabel(info)} ${pct}%</div>
@@ -488,15 +503,17 @@ function openSheet() {
     actionRow = `<button id="aWater" class="btn-water">Water</button><button id="aWeed" class="btn-weed">Remove weed</button>`;
   } else {
     actionRow = `<button id="aWater" class="btn-water">Water</button><button id="aFert" class="btn-fert" ${S.coins < 10 || fertOn ? 'disabled' : ''}>Fert 10c${fertOn ? ' ON' : ''}</button>`
-      + (info.state.startsWith('ready') ? `<button id="aHarv" class="btn-harv">Harvest +${preview}c${quality < 1 ? ' (thirsty)' : ''}</button>` : '');
+      + (info.state.startsWith('ready') ? `<button id="aHarv" class="btn-harv">Harvest +${preview}c${quality < 1 ? ' (thirsty)' : ''}</button>` : '')
+      + (!p.sprinkler ? `<button id="aSprink" class="btn-sprink" ${S.coins < 300 ? 'disabled' : ''}>Sprinkler 300c</button>` : '');
   }
   $('sheetBody').innerHTML = `
     <div class="sheet-art">${cropArt(p.cropId, artStage, !info.needsWater, info.progress)}</div>
     <p>Progress ${Math.round(info.progress * 100)}% | Health ${Math.round(p.health)}${p.weed ? ' | Weeds! Remove to grow happy.' : ''}</p>
-    <p class="muted">${info.needsWater ? 'Thirsty - water now or health drops.' : `Watered. Needs water again in ~${nextWaterH}h.`}${quality < 1 && info.state.startsWith('ready') ? ' Dry harvest pays half.' : ''}</p>
+    <p class="muted">${p.sprinkler ? 'Sprinkler installed - never goes thirsty. Weeds and harvests still need you!' : info.needsWater ? 'Thirsty - water now or health drops.' : `Watered. Needs water again in ~${nextWaterH}h.`}${quality < 1 && info.state.startsWith('ready') ? ' Dry harvest pays half.' : ''}</p>
     <div class="row">${actionRow}</div>`;
   const aw = $('aWater'); if (aw) aw.onclick = () => { water(activePlot); openSheet(); };
   const af = $('aFert'); if (af) af.onclick = () => { fertilize(activePlot); openSheet(); };
+  const as = $('aSprink'); if (as) as.onclick = () => { buySprinkler(activePlot); openSheet(); };
   const h = $('aHarv'); if (h) h.onclick = () => { harvest(activePlot); closeSheet(); };
   const c = $('aClear'); if (c) c.onclick = () => { clearPlot(activePlot); closeSheet(); };
   const w = $('aWeed'); if (w) w.onclick = () => { p.weed = false; addXp(2); save(); render(); openSheet(); };
