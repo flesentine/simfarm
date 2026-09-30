@@ -317,7 +317,9 @@ img.pixel { image-rendering: pixelated; }
 
 /* ===== 3D isometric dioramas: diamond tiles + floating crops + flat signs ===== */
 .plot { position: relative; background: transparent; border: 0; box-shadow: none;
-  min-height: 204px; padding: 2px; overflow: visible; }
+  min-height: 204px; padding: 2px; overflow: visible; transition: transform .12s steps(3); }
+.plot:active { transform: translateY(4px); }
+.plot:hover .diamond { filter: brightness(1.08); }
 .plot::after { display: none; }
 .plot .art { width: 64px; height: 64px; margin: 0; background: transparent; border: 0; padding: 0; }
 .plot .art svg { filter: drop-shadow(-3px 4px 0 rgba(0,0,0,.35)); }
@@ -335,8 +337,10 @@ img.pixel { image-rendering: pixelated; }
 .plot.thirsty .diamond { outline: 3px dashed #2176ae; outline-offset: 3px; }
 .plot.thirsty .diamond .mound { background: linear-gradient(180deg, #c09a5c 0%, #a57645 50%, #6b4426 100%); }
 .plot.wilted .diamond, .plot.dead .diamond { filter: sepia(.4) brightness(.9); }
-.cropX { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; pointer-events: none;
-  filter: drop-shadow(-3px 5px 0 rgba(0,0,0,.3)); }
+.cropX { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; pointer-events: none; }
+.cropX .art { filter: drop-shadow(-3px 5px 0 rgba(0,0,0,.3)); }
+.cropX .art::after { content: ""; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 10px; background: rgba(0,0,0,.25); border-radius: 50%; z-index: -1; }
 .plot.ready .cropX { animation: cropbob .8s steps(2) infinite; }
 .plot.ready .art { animation: none; background: transparent; border: 0; }
 @keyframes cropbob { 0% { margin-bottom: 0; } 50% { margin-bottom: 6px; } }
