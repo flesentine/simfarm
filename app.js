@@ -446,13 +446,13 @@ function renderYou() {
 function openSheet() {
   const p = S.plots[activePlot];
   if (!p) { closeSheet(); return; }
-  $('sheet').classList.remove('hidden');
   if (!p.unlocked) {
     const cost = UNLOCK_COST[activePlot] || 300;
     const short = Math.max(0, cost - S.coins);
     $('sheetTitle').textContent = `Locked plot ${activePlot + 1}`;
     $('sheetBody').innerHTML = `<div class="sheet-art">${cropArt(null, 'locked')}</div><p>Open this soil bed for <b>${cost}c</b> (you have ${S.coins}c)${short ? ` - earn ${short}c more` : ' - you can afford it!'}</p><div class="row"><button id="aUnlock" ${S.coins < cost ? 'disabled' : ''}>Unlock ${cost}c</button></div>`;
     $('aUnlock').onclick = () => { if (unlock(activePlot)) closeSheet(); else openSheet(); };
+    $('sheet').classList.remove('hidden');
     return;
   }
   const info = plotInfo(p);
@@ -466,6 +466,7 @@ function openSheet() {
     });
     $('sheetBody').innerHTML = html + `</div>`;
     $('sheetBody').querySelectorAll('button').forEach(b => b.onclick = () => { if (plant(activePlot, b.dataset.crop)) closeSheet(); else openSheet(); });
+    $('sheet').classList.remove('hidden');
     return;
   }
   const def = CROPS[p.cropId];
@@ -494,6 +495,7 @@ function openSheet() {
   const h = $('aHarv'); if (h) h.onclick = () => { harvest(activePlot); closeSheet(); };
   const c = $('aClear'); if (c) c.onclick = () => { clearPlot(activePlot); closeSheet(); };
   const w = $('aWeed'); if (w) w.onclick = () => { p.weed = false; addXp(2); save(); render(); openSheet(); };
+  $('sheet').classList.remove('hidden');
 }
 
 function closeSheet() { $('sheet').classList.add('hidden'); }
