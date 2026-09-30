@@ -534,6 +534,12 @@ $('ff24').onclick = () => fastForward(24 * H);
 $('reset').onclick = () => { if (confirm('Reset farm?')) { localStorage.removeItem(SAVE_KEY); S = defaultState(); save(); render(); } };
 
 // boot
+window.addEventListener('error', (e) => {
+  try {
+    const box = document.getElementById('errbox');
+    if (box) { box.classList.remove('hidden'); box.textContent = 'Error: ' + (e.message || 'unknown'); }
+  } catch { /* noop */ }
+});
 tick();
 render();
 setInterval(() => { tick(); render(); }, 30000);

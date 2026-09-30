@@ -1,4 +1,4 @@
-const CACHE = 'simfarm-v1';
+const CACHE = 'simfarm-v3';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.json', './art/crops.png', './art/farmer.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(()=>self.skipWaiting()));
