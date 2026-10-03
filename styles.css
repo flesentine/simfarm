@@ -346,3 +346,26 @@ img.pixel { image-rendering: pixelated; }
 @keyframes cropbob { 0% { margin-bottom: 0; } 50% { margin-bottom: 6px; } }
 .plot .cname, .plot .stage, .plot .bar, .plot .badges { position: relative; z-index: 3; }
 .plot .cname { margin-top: 26px; }
+
+/* ===== layout overhaul: responsive, landscape, compact UI ===== */
+body { max-width: 960px; }
+.view { padding: 12px 16px; }
+/* wider field on large screens */
+@media (min-width: 700px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+  .diamond { max-width: 140px; }
+  #view-farm .tip, #view-farm .away { font-size: 11px; }
+}
+/* compact dialogue stack */
+#view-farm .tip { margin-top: 8px; }
+#view-farm .away { margin-bottom: 6px; }
+/* smaller water button rails under the field sign */
+.waterall { width: auto; margin: 10px auto 0; display: block; padding: 8px 18px; font-size: 11px; }
+/* two-row HUD */
+.topbar { flex-wrap: wrap; row-gap: 8px; }
+.xpbar { margin: 8px 12px 0; }
+/* tab bar breathing room */
+.tabbar { bottom: 12px; }
+.tabbar button { padding: 12px 0 14px; }
+/* bigger scene presence */
+.scene { height: 110px; }

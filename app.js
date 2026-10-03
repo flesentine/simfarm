@@ -390,7 +390,7 @@ function renderGrid() {
       b.innerHTML = `<div class="diamond"><div class="mound"></div></div><div class="cropX" style="bottom:${bh}px"><div class="art" style="transform:scale(${sc})">${cropArt(null, 'empty', false)}</div></div><div class="cname">Empty soil</div><div class="stage">TAP TO PLANT</div>`;
     } else {
       const def = CROPS[p.cropId];
-      const pct = Math.round(info.progress * 100);
+      const pct = info.state === 'dead' ? 0 : Math.round(info.progress * 100);
       const wet = !info.needsWater;
       const artStage = info.state === 'dead' ? 'dead' : info.state === 'wilted' ? 'wilted' : info.state === 'ready-thirsty' ? 'ready' : info.state;
       const [sc, bh] = sizeFor(info.state);
